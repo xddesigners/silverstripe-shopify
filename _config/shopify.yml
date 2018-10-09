@@ -1,0 +1,13 @@
+---
+Name: shopify
+---
+#XD\Shopify\Client:
+#  api_key: ''
+#  api_password: ''
+#  storefront_access_token: ''
+#  shopify_domain: ''
+#  shared_secret: ''
+
+PageController:
+  extensions:
+    - XD\Shopify\Extension\ShopifyExtension
