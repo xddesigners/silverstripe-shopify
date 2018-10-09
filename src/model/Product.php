@@ -6,6 +6,7 @@ use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
+use SilverStripe\Core\Convert;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\ReadonlyField;
@@ -14,6 +15,8 @@ use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\TagField\TagField;
 use SilverStripe\Versioned\Versioned;
+use SilverStripe\View\Requirements;
+use SilverStripe\ORM\FieldType\DBCurrency;
 use XD\Shopify\Task\Import;
 
 /**
@@ -42,6 +45,21 @@ use XD\Shopify\Task\Import;
 class Product extends DataObject
 {
     private static $table_name = 'ShopifyProduct';
+
+    private static $currency = 'EUR';
+
+    private static $button_options = [
+        'product' => [
+            'contents' => [
+                'title' => false,
+                'variantTitle' => false,
+                'price' => false,
+                'description' => false,
+                'quantity' => false,
+                'img' => false,
+            ]
+        ]
+    ];
 
     private static $db = [
         'Title' => 'Varchar',
@@ -123,6 +141,42 @@ class Product extends DataObject
         return $fields;
     }
 
+    /**
+     * Merge in the configured button options
+     *
+     * @return string
+     */
+    public function getButtonOptions()
+    {
+        return Convert::array2json(array_merge_recursive(self::config()->get('button_options'), [
+            'product' => [
+                'text' => [
+                    'button' => _t('Shopify.ProductButton', 'Add to cart'),
+                    'outOfStock' => _t('Shopify.ProductOutOfStock', 'Out of stock'),
+                    'unavailable' => _t('Shopify.ProductUnavailable', 'Unavailable'),
+                ]
+            ]
+        ]));
+    }
+
+    public function getButtonScript()
+    {
+        $currencySymbol = DBCurrency::config()->get('currency_symbol');
+        Requirements::customScript(<<<JS
+            (function () {
+                if (window.shopifyClient) {
+                    window.shopifyClient.createComponent('product', {
+                        id: {$this->ShopifyID},
+                        node: document.getElementById('product-component-{$this->ShopifyID}'),
+                        moneyFormat: '$currencySymbol{{amount}}',
+                        options: {$this->ButtonOptions}
+                    });
+                }
+            })();
+JS
+        );
+    }
+    
     public function Link($action = null)
     {
         $shopifyPage = ShopifyPage::inst();

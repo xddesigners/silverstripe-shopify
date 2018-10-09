@@ -1,0 +1,10 @@
+nl:
+  Shopify:
+    ProductButton: 'In winkelmandje'
+    ProductOutOfStock: 'Niet op voorraad'
+    ProductUnavailable: 'Niet beschikbaar'
+    CartTitle: 'Winkelmandje'
+    CartEmpty: 'Jou winkelmand is leeg.'
+    CartButton: 'Afrekenen'
+    CartTotal: 'Subtotaal'
+    CartNotice: 'Verzendkosten en korting codes worden tijdens het afrekenen toegevoegd.'

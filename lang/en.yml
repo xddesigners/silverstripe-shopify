@@ -1,0 +1,10 @@
+en:
+  Shopify:
+    ProductButton: 'Add to cart'
+    ProductOutOfStock: 'Out of stock'
+    ProductUnavailable: 'Unavailable'
+    CartTitle: 'Cart'
+    CartEmpty: 'Your cart is empty.'
+    CartButton: 'Checkout'
+    CartTotal: 'Subtotal'
+    CartNotice: 'Shipping and discount codes are added at checkout.'
