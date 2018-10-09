@@ -3,9 +3,6 @@
         <div class="cell">
             <h3>$Title</h3>
             $Content
-
-            <div id="product-component-1543153647675"></div>
-            <div id="product-component-aadf09a82d6"></div>
         </div>
     </header>
     <article class="grid-container">
