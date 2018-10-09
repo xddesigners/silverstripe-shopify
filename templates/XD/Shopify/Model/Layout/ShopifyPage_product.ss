@@ -3,7 +3,6 @@
         <div class="cell">
             <h3>$Title</h3>
             $Content
-            <%-- include XD\\Shopify\\BuyButton ShopifyID='1557706735729' --%>
             <% include XD\\Shopify\\BuyButton %>
         </div>
     </header>
