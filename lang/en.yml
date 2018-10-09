@@ -1,5 +1,6 @@
 en:
   Shopify:
+    ReadMore: 'Read more'
     ProductButton: 'Add to cart'
     ProductOutOfStock: 'Out of stock'
     ProductUnavailable: 'Unavailable'

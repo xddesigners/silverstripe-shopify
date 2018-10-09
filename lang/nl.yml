@@ -1,5 +1,6 @@
 nl:
   Shopify:
+    ReadMore: 'Lees meer'
     ProductButton: 'In winkelmandje'
     ProductOutOfStock: 'Niet op voorraad'
     ProductUnavailable: 'Niet beschikbaar'
