@@ -21,7 +21,7 @@ class ShopifyExtension extends Extension
 {
     public function getCartOptions()
     {
-        return Convert::array2json([
+        return Convert::array2json(array_merge_recursive(Product::config()->get('options'), [
             'cart' => [
                 'text' => [
                     'title' => _t('Shopify.CartTitle', 'Cart'),
@@ -32,7 +32,7 @@ class ShopifyExtension extends Extension
                     'notice' => _t('Shopify.CartNotice', 'Shipping and discount codes are added at checkout.')
                 ]
             ]
-        ]);
+        ]));
     }
 
     public function onAfterInit()

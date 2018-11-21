@@ -48,7 +48,7 @@ class Product extends DataObject
 
     private static $currency = 'EUR';
 
-    private static $button_options = [
+    private static $options = [
         'product' => [
             'contents' => [
                 'title' => false,
@@ -148,7 +148,7 @@ class Product extends DataObject
      */
     public function getButtonOptions()
     {
-        return Convert::array2json(array_merge_recursive(self::config()->get('button_options'), [
+        return Convert::array2json(array_merge_recursive(self::config()->get('options'), [
             'product' => [
                 'text' => [
                     'button' => _t('Shopify.ProductButton', 'Add to cart'),
