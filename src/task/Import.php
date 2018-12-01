@@ -164,13 +164,6 @@ class Import extends BuildTask
                     ($collection = Collection::getByShopifyID($shopifyCollect->collection_id))
                     && ($product = Product::getByShopifyID($shopifyCollect->product_id))
                 ) {
-                    
-                    echo "<pre>";
-                    print_r($collection->Title);
-                    print_r($collection->Products()->toArray());
-                    echo "</pre>";
-                    exit();
-                    
                     $collection->Products()->add($product, [
                         'ShopifyID' => $shopifyCollect->id,
                         'SortValue' => $shopifyCollect->sort_value,
