@@ -7,15 +7,19 @@
     </header>
     <article class="grid-container">
 
-        <% if $Products %>
+        <% if $ChildPages %>
             <div class="grid-x grid-padding-x medium-up-3 large-up-4">
-                <% loop $Products %>
+                <% loop $ChildPages %>
                     <div class="cell">
-                        <% include XD\\Shopify\\Product %>
+                        <% if $ClassName == 'XD\Shopify\Model\Product' %>
+                            <% include XD\\Shopify\\Product %>
+                        <% else_if $ClassName == 'XD\Shopify\Model\Collection' %>
+                            <a href="$Link">Collection: $Title</a>
+                        <% end_if %>
                     </div>
                 <% end_loop %>
             </div>
-            <% with $Products %>
+            <% with $ChildPages %>
                 <div class="grid-x grid-padding-x">
                     <div class="cell">
                         <% include XD\\Shopify\\Pagination %>

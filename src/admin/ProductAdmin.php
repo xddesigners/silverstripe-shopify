@@ -5,6 +5,7 @@ namespace XD\Shopify\Admin;
 
 use SilverStripe\Admin\ModelAdmin;
 use XD\Shopify\Model\Product;
+use XD\Shopify\Model\Collection;
 
 /**
  * Class ProductAdmin
@@ -13,6 +14,7 @@ use XD\Shopify\Model\Product;
 class ProductAdmin extends ModelAdmin
 {
     private static $managed_models = [
+        Collection::class,
         Product::class
     ];
 

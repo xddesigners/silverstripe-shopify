@@ -15,7 +15,8 @@ use XD\Shopify\Client;
 class ShopifyPageController extends \PageController
 {
     private static $allowed_actions = [
-        'product'
+        'product',
+        'collection'
     ];
 
     /**
@@ -23,12 +24,27 @@ class ShopifyPageController extends \PageController
      *
      * @return PaginatedList
      */
-    public function Products()
+    public function ChildPages()
     {
+        $type = $this->ChildrenClass;
         return PaginatedList::create(
-            Product::get(),
+            $type::get(),
             $this->getRequest()
         )->setPageLength($this->PageLimit);
+    }
+
+    public function collection(HTTPRequest $request)
+    {
+        if (!$urlSegment = $request->param('ID')) {
+            $this->httpError(404);
+        }
+
+        /** @var Collection $collection */
+        if (!$collection = DataObject::get_one(Collection::class, ['URLSegment' => $urlSegment])) {
+            $this->httpError(404);
+        }
+
+        return $this->render($collection);
     }
 
     public function product(HTTPRequest $request)

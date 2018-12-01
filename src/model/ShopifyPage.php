@@ -2,6 +2,7 @@
 
 namespace XD\Shopify\Model;
 
+use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\ORM\DataObject;
 
@@ -12,17 +13,25 @@ use SilverStripe\ORM\DataObject;
  * @package XD\Shopify\Model
  *
  * @property int PageLimit
+ * @property string ChildrenClass
  */
 class ShopifyPage extends \Page
 {
     private static $table_name = 'ShopifyPage';
 
+    private static $children_classes = [
+        Collection::class => 'Collections',
+        Product::class => 'Products'
+    ];
+
     private static $db = [
-        'PageLimit' => 'Int'
+        'PageLimit' => 'Int',
+        'ChildrenClass' => 'Varchar'
     ];
 
     private static $defaults = [
-        'PageLimit' => 10
+        'PageLimit' => 10,
+        'ChildrenClass' => Collection::class
     ];
 
     public function getCMSFields()
@@ -34,9 +43,10 @@ class ShopifyPage extends \Page
     public function getSettingsFields()
     {
         $fields = parent::getSettingsFields();
-        $fields->add(
+        $fields->addFieldsToTab('Root.Settings', [
+            DropdownField::create('ChildrenClass', 'Display child pages', self::config()->get('children_classes')),
             NumericField::create('PageLimit')
-        );
+        ]);
 
         return $fields;
     }

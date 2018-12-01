@@ -83,7 +83,8 @@ class Image extends \SilverStripe\Assets\Image
 
         // import the image if the source has changed
         if ($image->isChanged('OriginalSrc', DataObject::CHANGE_VALUE)) {
-            $image->downloadImage($image->OriginalSrc, "shopify/{$shopifyImage->product_id}");
+            $folder = isset($shopifyImage->product_id) ? $shopifyImage->product_id : 'collection';
+            $image->downloadImage($image->OriginalSrc, "shopify/$folder");
         }
 
         $image->write();

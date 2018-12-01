@@ -78,6 +78,28 @@ class Client
     }
 
     /**
+     * Get the available Collections
+     *
+     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function collections()
+    {
+        return $this->client->request('GET', 'admin/custom_collections.json');
+    }
+
+    /**
+     * Get the connections between Products and Collections
+     *
+     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function collects()
+    {
+        return $this->client->request('GET', 'admin/collects.json');
+    }
+
+    /**
      * Get the configured Guzzle client
      *
      * @throws Exception

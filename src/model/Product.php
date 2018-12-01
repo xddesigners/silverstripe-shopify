@@ -92,6 +92,10 @@ class Product extends DataObject
         'Images' => Image::class
     ];
 
+    private static $belongs_many_many = [
+        'Collections' => Collection::class
+    ];
+
     private static $owns = [
         'Variants',
         'Images',
