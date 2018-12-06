@@ -15,13 +15,14 @@ use XD\Shopify\Task\Import;
  *
  * @property string Title
  * @property string ShopifyID
- * @property string Price
+ * @property float Price
+ * @property float CompareAtPrice
  * @property string SKU
  * @property int Sort
  * @property string Option1
  * @property string Option2
  * @property string Option3
- * @property boolean Tax
+ * @property boolean Taxable
  * @property string Barcode
  * @property int Inventory
  * @property int Grams
@@ -43,12 +44,13 @@ class ProductVariant extends DataObject
         'Title' => 'Varchar',
         'ShopifyID' => 'Varchar',
         'Price' => 'Currency',
+        'CompareAtPrice' => 'Currency',
         'SKU' => 'Varchar',
         'Sort' => 'Int',
         'Option1' => 'Varchar',
         'Option2' => 'Varchar',
         'Option3' => 'Varchar',
-        'Tax' => 'Boolean',
+        'Taxable' => 'Boolean',
         'Barcode' => 'Varchar',
         'Inventory' => 'Int',
         'Grams' => 'Int',
@@ -62,6 +64,7 @@ class ProductVariant extends DataObject
         'id'=> 'ShopifyID',
         'title'=> 'Title',
         'price'=> 'Price',
+        'compare_at_price'=> 'CompareAtPrice',
         'sku'=> 'SKU',
         'position' => 'Sort',
         'option1' => 'Option1',
@@ -69,7 +72,7 @@ class ProductVariant extends DataObject
         'option3' => 'Option3',
         'created_at' => 'Created',
         'updated_at' => 'LastEdited',
-        'taxable' => 'Tax',
+        'taxable' => 'Taxable',
         'barcode' => 'Barcode',
         'grams' => 'Grams',
         'inventory_quantity' => 'Inventory',
