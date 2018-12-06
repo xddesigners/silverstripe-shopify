@@ -57,9 +57,9 @@ class Client
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception
      */
-    public function products()
+    public function products(array $options = [])
     {
-        return $this->client->request('GET', 'admin/products.json');
+        return $this->client->request('GET', 'admin/products.json', $options);
     }
 
     /**

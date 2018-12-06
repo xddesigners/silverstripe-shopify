@@ -212,6 +212,14 @@ JS
         return $product;
     }
 
+    public function onBeforeDelete()
+    {
+        parent::onBeforeDelete();
+        $this->Variants()->removeAll();
+        $this->Images()->removeAll();
+        $this->doUnpublish();
+    }
+
     public static function getByShopifyID($shopifyId)
     {
         return DataObject::get_one(self::class, ['ShopifyID' => $shopifyId]);

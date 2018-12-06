@@ -5,6 +5,7 @@ namespace XD\Shopify\Task;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Convert;
 use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\ArrayList;
 use XD\Shopify\Client;
 use XD\Shopify\Model\Collection;
 use XD\Shopify\Model\Image;
@@ -41,8 +42,8 @@ class Import extends BuildTask
             exit($e->getMessage());
         }
 
-        $this->importCollects($client);
-        $this->importCollections($client);
+        //$this->importCollects($client);
+        //$this->importCollections($client);
         $this->importProducts($client);
 
         if (!Director::is_cli()) echo "</pre>";
@@ -58,7 +59,12 @@ class Import extends BuildTask
     public function importProducts(Client $client)
     {
         try {
-            $products = $client->products();
+            $products = $client->products([
+                'query' => [
+                    'limit' => 250,
+                    'published_status' => 'published'
+                ]
+            ]);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             exit($e->getMessage());
         }
@@ -68,10 +74,22 @@ class Import extends BuildTask
                 // Create the product
                 if ($product = $this->importObject(Product::class, $shopifyProduct)) {
                     // Create the images
-                    if (!empty($shopifyProduct->images)) {
+                    $images = new ArrayList($shopifyProduct->images);
+                    if ($images->exists()) {
                         foreach ($shopifyProduct->images as $shopifyImage) {
                             if ($image = $this->importObject(Image::class, $shopifyImage)) {
                                 $product->Images()->add($image);
+                            }
+                        }
+
+                        // Cleanup old images
+                        $current = $product->Images()->column('ShopifyID');
+                        $new = $images->column('id');
+                        $delete = array_diff($current, $new);
+                        foreach ($delete as $shopifyId) {
+                            if ($image = Image::getByShopifyID($shopifyId)) {
+                                $image->delete();
+                                self::log("[$shopifyId] Deleted image", self::SUCCESS);
                             }
                         }
                     }
@@ -100,6 +118,20 @@ class Import extends BuildTask
                     self::log("[{$product->ID}] Published product {$product->Title} and it's connections", self::SUCCESS);
                 } else {
                     self::log("[{$shopifyProduct->id}] Could not create product", self::ERROR);
+                }
+            }
+
+            // Cleanup old products
+            $newProducts = new ArrayList($products->products);
+            $current = Product::get()->column('ShopifyID');
+            $new = $newProducts->column('id');
+            $delete = array_diff($current, $new);
+            foreach ($delete as $shopifyId) {
+                /** @var Product $product */
+                if ($product = Product::getByShopifyID($shopifyId)) {
+                    $product->doUnpublish();
+                    $product->delete();
+                    self::log("[$shopifyId] Deleted product and it's connections", self::SUCCESS);
                 }
             }
         }

@@ -64,6 +64,13 @@ class Image extends \SilverStripe\Assets\Image
         return $fields;
     }
 
+    public function onBeforeDelete()
+    {
+        parent::onBeforeDelete();
+        $this->doUnpublish();
+        $this->deleteFile();
+    }
+
     /**
      * Creates a new Shopify Image from the given data
      *

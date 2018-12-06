@@ -134,6 +134,12 @@ class ProductVariant extends DataObject
         return $variant;
     }
 
+    public function onBeforeDelete()
+    {
+        parent::onBeforeDelete();
+        $this->doUnpublish();
+    }
+
     public static function getByShopifyID($shopifyId)
     {
         return DataObject::get_one(self::class, ['ShopifyID' => $shopifyId]);
