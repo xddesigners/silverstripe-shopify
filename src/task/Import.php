@@ -88,6 +88,8 @@ class Import extends BuildTask
                         $delete = array_diff($current, $new);
                         foreach ($delete as $shopifyId) {
                             if ($image = Image::getByShopifyID($shopifyId)) {
+                                $image->deleteFile();
+                                $image->doUnpublish();
                                 $image->delete();
                                 self::log("[$shopifyId] Deleted image", self::SUCCESS);
                             }
@@ -129,6 +131,23 @@ class Import extends BuildTask
             foreach ($delete as $shopifyId) {
                 /** @var Product $product */
                 if ($product = Product::getByShopifyID($shopifyId)) {
+                    foreach ($product->Images() as $image) {
+                        /** @var Image $image */
+                        $imageId = $image->ShopifyID;
+                        $image->doUnpublish();
+                        $image->deleteFile();
+                        $image->delete();
+                        self::log("[$shopifyId][$imageId] Deleted image connected to product", self::SUCCESS);
+                    }
+
+                    foreach ($product->Variants() as $variant) {
+                        /** @var ProductVariant $variant */
+                        $variantId = $variant->ShopifyID;
+                        $variant->doUnpublish();
+                        $variant->delete();
+                        self::log("[$shopifyId][$variantId] Deleted variant connected to product", self::SUCCESS);
+                    }
+
                     $product->doUnpublish();
                     $product->delete();
                     self::log("[$shopifyId] Deleted product and it's connections", self::SUCCESS);
