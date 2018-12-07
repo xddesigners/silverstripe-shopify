@@ -42,8 +42,8 @@ class Import extends BuildTask
             exit($e->getMessage());
         }
 
-        //$this->importCollects($client);
-        //$this->importCollections($client);
+        $this->importCollects($client);
+        $this->importCollections($client);
         $this->importProducts($client);
 
         if (!Director::is_cli()) echo "</pre>";
@@ -165,7 +165,12 @@ class Import extends BuildTask
     public function importCollections(Client $client)
     {
         try {
-            $collections = $client->collections();
+            $collections = $client->collections([
+                'query' => [
+                    'limit' => 250,
+                    'published_status' => 'published'
+                ]
+            ]);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             exit($e->getMessage());
         }
@@ -204,7 +209,11 @@ class Import extends BuildTask
     public function importCollects(Client $client)
     {
         try {
-            $collects = $client->collects();
+            $collects = $client->collects([
+                'query' => [
+                    'limit' => 250
+                ]
+            ]);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             exit($e->getMessage());
         }

@@ -72,9 +72,9 @@ class Client
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Exception
      */
-    public function product($productId)
+    public function product($productId, array $options = [])
     {
-        return $this->client->request('GET', "admin/products/$productId.json");
+        return $this->client->request('GET', "admin/products/$productId.json", $options);
     }
 
     /**
@@ -83,9 +83,9 @@ class Client
      * @return mixed|\Psr\Http\Message\ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function collections()
+    public function collections(array $options = [])
     {
-        return $this->client->request('GET', 'admin/custom_collections.json');
+        return $this->client->request('GET', 'admin/custom_collections.json', $options);
     }
 
     /**
@@ -94,9 +94,9 @@ class Client
      * @return mixed|\Psr\Http\Message\ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function collects()
+    public function collects(array $options = [])
     {
-        return $this->client->request('GET', 'admin/collects.json');
+        return $this->client->request('GET', 'admin/collects.json', $options);
     }
 
     /**
