@@ -167,8 +167,7 @@ class Import extends BuildTask
         try {
             $collections = $client->collections([
                 'query' => [
-                    'limit' => 250,
-                    'published_status' => 'published'
+                    'limit' => 250
                 ]
             ]);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
