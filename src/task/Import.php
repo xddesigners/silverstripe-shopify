@@ -269,8 +269,8 @@ class Import extends BuildTask
         foreach ($map as $from => $to) {
             if (is_array($to) && is_object($data->{$from})) {
                 self::loop_map($to, $object, $data->{$from});
-            } elseif (isset($data->{$from}) && $value = $data->{$from}) {
-                $object->{$to} = $value;
+            } elseif (isset($data->{$from})) {
+                $object->{$to} = $data->{$from};
             }
         }
     }
