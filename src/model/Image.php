@@ -87,7 +87,14 @@ class Image extends \SilverStripe\Assets\Image
             $image->downloadImage($image->OriginalSrc, "shopify/$folder");
         }
 
-        $image->write();
+        if ($image->isChanged()) {
+            $image->write();
+        }
+
+        if (!$image->isPublished()) {
+            $image->publishSingle();
+        }
+
         return $image;
     }
 

@@ -130,7 +130,10 @@ class ProductVariant extends DataObject
             $variant->ImageID = $image->ID;
         }
 
-        $variant->write();
+        if ($variant->isChanged()) {
+            $variant->write();
+        }
+        
         return $variant;
     }
 

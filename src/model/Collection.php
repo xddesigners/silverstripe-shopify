@@ -141,7 +141,10 @@ class Collection extends DataObject
         $map = self::config()->get('data_map');
         Import::loop_map($map, $collection, $shopifyCollection);
 
-        $collection->write();
+        if ($collection->isChanged()) {
+            $collection->write();
+        }
+        
         return $collection;
     }
 

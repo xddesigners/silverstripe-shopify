@@ -100,7 +100,6 @@ class Import extends BuildTask
                     if (($image = $shopifyProduct->image) && ($imageID = $image->id) && ($image = Image::getByShopifyID($imageID))) {
                         try {
                             $product->ImageID = $image->ID;
-                            $product->write();
                         } catch (\Exception $e) {
                             self::log($e->getMessage(), self::ERROR);
                         }
@@ -111,13 +110,30 @@ class Import extends BuildTask
                         foreach ($shopifyProduct->variants as $shopifyVariant) {
                             if ($variant = $this->importObject(ProductVariant::class, $shopifyVariant)) {
                                 $product->Variants()->add($variant);
+                                if (!$variant->isPublished()) {
+                                    $variant->publishSingle();
+                                    self::log("[{$variant->ID}] Published Variant {$product->Title}", self::SUCCESS);
+                                } else {
+                                    self::log("[{$variant->ID}] Variant {$variant->Title} is alreaddy published", self::SUCCESS);
+                                }
                             }
                         }
                     }
 
+                    if ($product->isChanged()) {
+                        $product->write();
+                        self::log("[{$product->ID}] Saved changes in product {$product->Title}", self::SUCCESS);
+                    } else {
+                        self::log("[{$product->ID}] Product {$product->Title} has no changes", self::SUCCESS);
+                    }
+
                     // Publish the product and it's connections
-                    $product->publishRecursive();
-                    self::log("[{$product->ID}] Published product {$product->Title} and it's connections", self::SUCCESS);
+                    if (!$product->isPublished()) {
+                        $product->publishSingle();
+                        self::log("[{$product->ID}] Published product {$product->Title}", self::SUCCESS);
+                    } else {
+                        self::log("[{$product->ID}] Product {$product->Title} is alreaddy published", self::SUCCESS);
+                    }
                 } else {
                     self::log("[{$shopifyProduct->id}] Could not create product", self::ERROR);
                 }
@@ -185,13 +201,20 @@ class Import extends BuildTask
                         $image->id = $image->src;
                         if ($image = $this->importObject(Image::class, $image)) {
                             $collection->ImageID = $image->ID;
-                            $collection->write();
+                            if ($collection->isChanged()) {
+                                $collection->write();
+                            } else {
+                                self::log("[{$collection->ID}] Collection {$collection->Title} has no change", self::SUCCESS);
+                            }
                         }
                     }
 
-                    // Publish the product and it's connections
-                    $collection->publishRecursive();
-                    self::log("[{$collection->ID}] Published collection {$collection->Title} and it's connections", self::SUCCESS);
+                    if (!$collection->isPublished()) {
+                        $collection->publishSingle();
+                        self::log("[{$collection->ID}] Published collection {$collection->Title} and it's connections", self::SUCCESS);
+                    } else {
+                        self::log("[{$collection->ID}] Collection {$collection->Title} is alreaddy published", self::SUCCESS);
+                    }
                 } else {
                     self::log("[{$shopifyCollection->id}] Could not create collection", self::ERROR);
                 }

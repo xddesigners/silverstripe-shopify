@@ -207,8 +207,11 @@ JS
 
         $map = self::config()->get('data_map');
         Import::loop_map($map, $product, $shopifyProduct);
+
+        if ($product->isChanged()) {
+            $product->write();
+        }
         
-        $product->write();
         return $product;
     }
 
