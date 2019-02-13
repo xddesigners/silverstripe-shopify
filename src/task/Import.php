@@ -110,7 +110,7 @@ class Import extends BuildTask
                         foreach ($shopifyProduct->variants as $shopifyVariant) {
                             if ($variant = $this->importObject(ProductVariant::class, $shopifyVariant)) {
                                 $product->Variants()->add($variant);
-                                if (!$variant->isPublished()) {
+                                if (!$variant->isLiveVersion()) {
                                     $variant->publishSingle();
                                     self::log("[{$variant->ID}] Published Variant {$product->Title}", self::SUCCESS);
                                 } else {
@@ -128,7 +128,7 @@ class Import extends BuildTask
                     }
 
                     // Publish the product and it's connections
-                    if (!$product->isPublished()) {
+                    if (!$product->isLiveVersion()) {
                         $product->publishSingle();
                         self::log("[{$product->ID}] Published product {$product->Title}", self::SUCCESS);
                     } else {
@@ -209,7 +209,7 @@ class Import extends BuildTask
                         }
                     }
 
-                    if (!$collection->isPublished()) {
+                    if (!$collection->isLiveVersion()) {
                         $collection->publishSingle();
                         self::log("[{$collection->ID}] Published collection {$collection->Title} and it's connections", self::SUCCESS);
                     } else {
