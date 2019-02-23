@@ -91,7 +91,7 @@ class Image extends \SilverStripe\Assets\Image
             $image->write();
         }
 
-        if (!$image->isPublished()) {
+        if (!$image->isLiveVersion()) {
             $image->publishSingle();
         }
 
