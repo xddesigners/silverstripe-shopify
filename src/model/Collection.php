@@ -9,6 +9,7 @@ use SilverStripe\Control\Director;
 use SilverStripe\Core\Convert;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBInt;
@@ -97,19 +98,22 @@ class Collection extends DataObject
 
     public function getCMSFields()
     {
+        $self =& $this;
+        $this->beforeUpdateCMSFields(function (FieldList $fields) use ($self) {
+            $fields->addFieldsToTab('Root.Main', [
+                ReadonlyField::create('Title'),
+                ReadonlyField::create('URLSegment'),
+                ReadonlyField::create('ShopifyID'),
+                ReadonlyField::create('Content'),
+                UploadField::create('Image')->performReadonlyTransformation(),
+            ]);
+
+            $fields->addFieldsToTab('Root.Products', [
+                GridField::create('Products', 'Products', $this->Products(), GridFieldConfig_RecordViewer::create())
+            ]);
+        });
+        
         $fields = parent::getCMSFields();
-        $fields->addFieldsToTab('Root.Main', [
-            ReadonlyField::create('Title'),
-            ReadonlyField::create('URLSegment'),
-            ReadonlyField::create('ShopifyID'),
-            ReadonlyField::create('Content'),
-            UploadField::create('Image')->performReadonlyTransformation(),
-        ]);
-
-        $fields->addFieldsToTab('Root.Products', [
-            GridField::create('Products', 'Products', $this->Products(), GridFieldConfig_RecordViewer::create())
-        ]);
-
         $fields->removeByName(['LinkTracking', 'FileTracking']);
         return $fields;
     }
