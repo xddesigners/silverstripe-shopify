@@ -62,7 +62,7 @@ class Import extends BuildTask
             $products = $client->products([
                 'query' => [
                     'limit' => 250,
-                    'published_status' => 'published'
+                    'published_scope' => 'global'
                 ]
             ]);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
