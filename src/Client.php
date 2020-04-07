@@ -78,6 +78,16 @@ class Client
     }
 
     /**
+     * Get available product listing ids
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function productListingIds(array  $options = [])
+    {
+        return $this->client->request('GET', "admin/product_listings/product_ids.json", $options);
+    }
+
+    /**
      * Get the available Collections
      *
      * @return mixed|\Psr\Http\Message\ResponseInterface

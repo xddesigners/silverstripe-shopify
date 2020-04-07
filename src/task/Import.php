@@ -44,26 +44,63 @@ class Import extends BuildTask
 
         $this->importCollects($client);
         $this->importCollections($client);
-        $this->importProducts($client);
+
+        // Import products listed to our app or import all products
+        // Import listings need a special authentication so fallback to everything
+        $importedListingIds = $this->importProductListingIds($client);
+        $this->importProducts($client, $importedListingIds);
 
         if (!Director::is_cli()) echo "</pre>";
         exit('Done');
     }
 
     /**
+     * Get an array of available product ids
+     *
+     * @param Client $client
+     * @return array
+     */
+    public function importProductListingIds(Client $client)
+    {
+        try {
+            $listings = $client->productListingIds([
+                'query' => [
+                    'limit' => 250
+                ]
+            ]);
+        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+            exit($e->getMessage());
+        }
+
+        if (($listings = $listings->getBody()->getContents()) && $listings = Convert::json2obj($listings)) {
+            return $listings->product_ids;
+        }
+
+        return [];
+    }
+
+    /**
      * Import the shopify products
      * @param Client $client
+     * @param array $ids
      *
      * @throws \Exception
      */
-    public function importProducts(Client $client)
+    public function importProducts(Client $client, array $ids = [])
     {
+        $query = [
+            'limit' => 250,
+            'published_scope' => 'global'
+        ];
+
+        // if we have a list of id's use it as a filter
+        if (count($ids)) {
+            $query['ids'] = implode(',', $ids);
+        }
+
         try {
             $products = $client->products([
-                'query' => [
-                    'limit' => 250,
-                    'published_scope' => 'global'
-                ]
+                'query' => $query
             ]);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
             exit($e->getMessage());
