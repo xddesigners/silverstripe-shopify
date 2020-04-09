@@ -145,6 +145,35 @@ class Product extends DataObject
         return $fields;
     }
 
+    public function getVariantWithLowestPrice()
+    {
+        return DataObject::get_one(ProductVariant::class, ['ProductID' => $this->ID], true, 'Price ASC');
+    }
+
+    /**
+     * @return DBCurrency|null
+     */
+    public function getPrice()
+    {
+        if ($product = $this->getVariantWithLowestPrice()) {
+            return $product->dbObject('Price');
+        }
+
+        return null;
+    }
+
+    /**
+     * @return DBCurrency|null
+     */
+    public function getCompareAtPrice()
+    {
+        if ($product = $this->getVariantWithLowestPrice()) {
+            return $product->dbObject('CompareAtPrice');
+        }
+
+        return null;
+    }
+
     /**
      * Merge in the configured button options
      *
