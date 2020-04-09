@@ -42,13 +42,12 @@ class Import extends BuildTask
             exit($e->getMessage());
         }
 
-        $this->importCollects($client);
         $this->importCollections($client);
-
         // Import products listed to our app or import all products
         // Import listings need a special authentication so fallback to everything
         $importedListingIds = $this->importProductListingIds($client);
         $this->importProducts($client, $importedListingIds);
+        $this->importCollects($client);
 
         if (!Director::is_cli()) echo "</pre>";
         exit('Done');
