@@ -31,6 +31,8 @@ class Image extends \SilverStripe\Assets\Image
         'OriginalSrc' => 'Varchar'
     ];
 
+    private static $default_sort = 'Sort ASC';
+
     private static $data_map = [
         'id' => 'ShopifyID',
         'alt' => 'Title',

@@ -194,8 +194,9 @@ class Product extends DataObject
 
     public function getButtonScript()
     {
-        $currencySymbol = DBCurrency::config()->get('currency_symbol');
-        Requirements::customScript(<<<JS
+        if ($this->ShopifyID) {
+            $currencySymbol = DBCurrency::config()->get('currency_symbol');
+            Requirements::customScript(<<<JS
             (function () {
                 if (window.shopifyClient) {
                     window.shopifyClient.createComponent('product', {
@@ -207,7 +208,8 @@ class Product extends DataObject
                 }
             })();
 JS
-        );
+            );
+        }
     }
     
     public function Link($action = null)
