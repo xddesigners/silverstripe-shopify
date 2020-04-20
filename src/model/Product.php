@@ -71,6 +71,18 @@ class Product extends DataObject
         'Tags' => 'Varchar'
     ];
 
+    private static $default_sort = 'Created DESC';
+
+    private static $searchable_fields = [
+        'Title',
+        'URLSegment',
+        'ShopifyID',
+        'Content',
+        'Vendor',
+        'ProductType',
+        'Tags'
+    ];
+
     private static $data_map = [
         'id' => 'ShopifyID',
         'title' => 'Title',
