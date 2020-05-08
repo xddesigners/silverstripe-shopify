@@ -3,6 +3,7 @@
 namespace XD\Shopify;
 
 use Exception;
+use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Configurable;
 
 /**
@@ -18,6 +19,13 @@ class Client
     const EXCEPTION_NO_API_KEY = 0;
     const EXCEPTION_NO_API_PASSWORD = 1;
     const EXCEPTION_NO_DOMAIN = 2;
+
+    /**
+     * Configures the version of the api that you want to use
+     *
+     * @config string
+     */
+    private static $api_version = '2020-04';
 
     /**
      * @config null|string
@@ -59,7 +67,7 @@ class Client
      */
     public function products(array $options = [])
     {
-        return $this->client->request('GET', 'admin/products.json', $options);
+        return $this->client->request('GET', 'products.json', $options);
     }
 
     /**
@@ -74,7 +82,7 @@ class Client
      */
     public function product($productId, array $options = [])
     {
-        return $this->client->request('GET', "admin/products/$productId.json", $options);
+        return $this->client->request('GET', "products/$productId.json", $options);
     }
 
     /**
@@ -84,7 +92,7 @@ class Client
      */
     public function productListingIds(array  $options = [])
     {
-        return $this->client->request('GET', "admin/product_listings/product_ids.json", $options);
+        return $this->client->request('GET', "product_listings/product_ids.json", $options);
     }
 
     /**
@@ -95,7 +103,7 @@ class Client
      */
     public function collections(array $options = [])
     {
-        return $this->client->request('GET', 'admin/custom_collections.json', $options);
+        return $this->client->request('GET', 'custom_collections.json', $options);
     }
 
     /**
@@ -106,7 +114,7 @@ class Client
      */
     public function collects(array $options = [])
     {
-        return $this->client->request('GET', 'admin/collects.json', $options);
+        return $this->client->request('GET', 'collects.json', $options);
     }
 
     /**
@@ -128,8 +136,10 @@ class Client
             throw new Exception('No shopify domain is set.', self::EXCEPTION_NO_DOMAIN);
         }
 
+        $version = self::config()->get('api_version');
+        
         $this->client = new \GuzzleHttp\Client([
-            'base_uri' => "https://$domain",
+            'base_uri' => Controller::join_links(["https://$domain", 'admin/api', $version, '/']),
             'headers' => [
                 'Content-Type' => 'application/json; charset=utf-8',
                 'Authorization' => 'Basic ' . base64_encode("$key:$password")

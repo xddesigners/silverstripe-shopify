@@ -22,7 +22,6 @@ use XD\Shopify\Task\Import;
  */
 class Image extends \SilverStripe\Assets\Image
 {
-
     private static $table_name = 'ShopifyImage';
 
     private static $db = [

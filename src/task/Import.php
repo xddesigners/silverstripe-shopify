@@ -85,11 +85,12 @@ class Import extends BuildTask
      *
      * @throws \Exception
      */
-    public function importProducts(Client $client, array $ids = [])
+    public function importProducts(Client $client, array $ids = [], $sinceId = 0)
     {
         $query = [
             'limit' => 250,
-            'published_scope' => 'global'
+            'published_scope' => 'global',
+            'since_id' => $sinceId
         ];
 
         // if we have a list of id's use it as a filter
@@ -106,6 +107,7 @@ class Import extends BuildTask
         }
 
         if (($products = $products->getBody()->getContents()) && $products = Convert::json2obj($products)) {
+            $lastId = $sinceId;
             foreach ($products->products as $shopifyProduct) {
                 // Create the product
                 if ($product = $this->importObject(Product::class, $shopifyProduct)) {
@@ -170,10 +172,17 @@ class Import extends BuildTask
                     } else {
                         self::log("[{$product->ID}] Product {$product->Title} is alreaddy published", self::SUCCESS);
                     }
+                    $lastId = $product->ShopifyID;
                 } else {
                     self::log("[{$shopifyProduct->id}] Could not create product", self::ERROR);
                 }
             }
+
+            // todo make pagination work with products
+            //if ($lastId !== $sinceId) {
+            //    self::log("[{$sinceId}] Try to import the next page of products since last id", self::SUCCESS);
+            //    $this->importProducts($client, $ids, $lastId);
+            //}
 
             // Cleanup old products
             $newProducts = new ArrayList($products->products);
@@ -214,12 +223,13 @@ class Import extends BuildTask
      *
      * @throws \SilverStripe\ORM\ValidationException
      */
-    public function importCollections(Client $client)
+    public function importCollections(Client $client, $sinceId = 0)
     {
         try {
             $collections = $client->collections([
                 'query' => [
-                    'limit' => 250
+                    'limit' => 250,
+                    'since_id' => $sinceId
                 ]
             ]);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
@@ -227,6 +237,7 @@ class Import extends BuildTask
         }
 
         if (($collections = $collections->getBody()->getContents()) && $collections = Convert::json2obj($collections)) {
+            $lastId = $sinceId;
             foreach ($collections->custom_collections as $shopifyCollection) {
                 // Create the collection
                 if ($collection = $this->importObject(Collection::class, $shopifyCollection)) {
@@ -251,9 +262,15 @@ class Import extends BuildTask
                     } else {
                         self::log("[{$collection->ID}] Collection {$collection->Title} is alreaddy published", self::SUCCESS);
                     }
+                    $lastId = $collection->ShopifyID;
                 } else {
                     self::log("[{$shopifyCollection->id}] Could not create collection", self::ERROR);
                 }
+            }
+
+            if ($lastId !== $sinceId) {
+                self::log("[{$sinceId}] Try to import the next page of collections since last id", self::SUCCESS);
+                $this->importCollections($client, $lastId);
             }
         }
     }
@@ -264,12 +281,13 @@ class Import extends BuildTask
      *
      * @throws \SilverStripe\ORM\ValidationException
      */
-    public function importCollects(Client $client)
+    public function importCollects(Client $client, $sinceId = 0)
     {
         try {
             $collects = $client->collects([
                 'query' => [
-                    'limit' => 250
+                    'limit' => 250,
+                    'since_id' => $sinceId
                 ]
             ]);
         } catch (\GuzzleHttp\Exception\GuzzleException $e) {
@@ -277,6 +295,7 @@ class Import extends BuildTask
         }
 
         if (($collects = $collects->getBody()->getContents()) && $collects = Convert::json2obj($collects)) {
+            $lastId = $sinceId;
             foreach ($collects->collects as $shopifyCollect) {
                 if (
                     ($collection = Collection::getByShopifyID($shopifyCollect->collection_id))
@@ -285,11 +304,17 @@ class Import extends BuildTask
                     $collection->Products()->add($product, [
                         'ShopifyID' => $shopifyCollect->id,
                         'SortValue' => $shopifyCollect->sort_value,
-                        'Position' => $shopifyCollect->position,
-                        'Featured' => $shopifyCollect->featured
+                        'Position' => $shopifyCollect->position
                     ]);
+
+                    $lastId = $shopifyCollect->id;
                     self::log("[{$shopifyCollect->id}] Created collect between Product[{$product->ID}] and Collection[{$collection->ID}]", self::SUCCESS);
                 }
+            }
+
+            if ($lastId !== $sinceId) {
+                self::log("[{$sinceId}] Try to import the next page of collects since last id", self::SUCCESS);
+                $this->importCollects($client, $lastId);
             }
         }
     }
