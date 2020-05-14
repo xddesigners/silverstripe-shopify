@@ -1,6 +1,6 @@
 <?php
 
-namespace XD\Shopify\Model;
+namespace XD\Shopify\Control;
 
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\ORM\DataObject;

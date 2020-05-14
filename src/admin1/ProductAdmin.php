@@ -22,6 +22,5 @@ class ProductAdmin extends ModelAdmin
 
     private static $menu_title = 'Shopify';
 
-    //private static $menu_icon = 'xddesigners/silverstripe-shopify:images/shopify_glyph.svg';
     private static $menu_icon_class = 'font-icon-cart';
 }

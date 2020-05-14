@@ -5,6 +5,7 @@ namespace XD\Shopify\Model;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\ORM\DataObject;
+use XD\Shopify\Control\ShopifyPageController;
 
 /**
  * Class ShopifyPage
@@ -34,6 +35,8 @@ class ShopifyPage extends \Page
         'ChildrenClass' => Collection::class
     ];
 
+    private static $controller_name = ShopifyPageController::class;
+    
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
