@@ -6,6 +6,9 @@ use SilverStripe\Control\Director;
 use SilverStripe\Core\Convert;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DataObjectSchema;
+use SilverStripe\ORM\DB;
 use XD\Shopify\Client;
 use XD\Shopify\Model\Collection;
 use XD\Shopify\Model\Image;
@@ -45,9 +48,11 @@ class Import extends BuildTask
         $this->importCollections($client);
         // Import products listed to our app or import all products
         // Import listings need a special authentication so fallback to everything
-        $importedListingIds = $this->importProductListingIds($client);
+        $importedListingIds = $this->getProductListingIds($client);
         $this->importProducts($client, $importedListingIds);
+        $this->beforeImportCollects();
         $this->importCollects($client);
+        $this->afterImportCollects();
 
         if (!Director::is_cli()) echo "</pre>";
         exit('Done');
@@ -59,7 +64,7 @@ class Import extends BuildTask
      * @param Client $client
      * @return array
      */
-    public function importProductListingIds(Client $client)
+    public function getProductListingIds(Client $client)
     {
         try {
             $listings = $client->productListingIds([
@@ -304,7 +309,8 @@ class Import extends BuildTask
                     $collection->Products()->add($product, [
                         'ShopifyID' => $shopifyCollect->id,
                         'SortValue' => $shopifyCollect->sort_value,
-                        'Position' => $shopifyCollect->position
+                        'Position' => $shopifyCollect->position,
+                        'Imported' => true
                     ]);
 
                     $lastId = $shopifyCollect->id;
@@ -316,6 +322,26 @@ class Import extends BuildTask
                 self::log("[{$sinceId}] Try to import the next page of collects since last id", self::SUCCESS);
                 $this->importCollects($client, $lastId);
             }
+        }
+    }
+
+    // todo make this flexible so it's also usable for Products, Variants, Images, Collections.
+    // if made flexible should also handle versions.
+    public function beforeImportCollects()
+    {
+        // Set all imported values to 0
+        $schema = DataObject::getSchema()->manyManyComponent(Collection::class, 'Products');
+        if (isset($schema['join']) && $join = $schema['join']) {
+            DB::query("UPDATE `$join` SET `Imported` = 0 WHERE 1");
+        }
+    }
+
+    public function afterImportCollects()
+    {
+        // Delete all collects that where not given during importe
+        $schema = DataObject::getSchema()->manyManyComponent(Collection::class, 'Products');
+        if (isset($schema['join']) && $join = $schema['join']) {
+            DB::query("DELETE FROM `$join` WHERE `Imported` = 0");
         }
     }
 

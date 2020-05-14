@@ -73,7 +73,8 @@ class Collection extends DataObject
         'Products' => [
             'SortValue' => 'Varchar',
             'Position' => 'Int',
-            'Featured' => 'Boolean'
+            'Featured' => 'Boolean',
+            'Imported' => 'Boolean'
         ],
     ];
 
