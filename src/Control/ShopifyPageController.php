@@ -7,6 +7,8 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\PaginatedList;
 use SilverStripe\View\Requirements;
 use XD\Shopify\Client;
+use XD\Shopify\Model\Product;
+use XD\Shopify\Model\Collection;
 
 /**
  * Class ShopifyPageController
