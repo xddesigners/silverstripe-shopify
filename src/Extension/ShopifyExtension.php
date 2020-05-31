@@ -37,25 +37,27 @@ class ShopifyExtension extends Extension
 
     public function onAfterInit()
     {
-        $domain = Client::config()->get('shopify_domain');
-        $accessToken = Client::config()->get('storefront_access_token');
-        $currencySymbol = DBCurrency::config()->get('currency_symbol');
-        Requirements::javascript('//sdks.shopifycdn.com/buy-button/latest/buybutton.js');
-        Requirements::customScript(<<<JS
-        (function () {
-            var client = ShopifyBuy.buildClient({
-              domain: '{$domain}',
-              storefrontAccessToken: '{$accessToken}'
-            });
-            
-            window.shopifyClient = ShopifyBuy.UI.init(client);
-            window.shopifyClient.createComponent('cart', {
-               node: document.getElementById('shopify-cart'),
-               moneyFormat: '$currencySymbol{{amount}}',
-               options: {$this->getCartOptions()}
-            });
-        })();
+        if (Client::config()->get('inject_javascript') !== false) {
+            $domain = Client::config()->get('shopify_domain');
+            $accessToken = Client::config()->get('storefront_access_token');
+            $currencySymbol = DBCurrency::config()->get('currency_symbol');
+            Requirements::javascript('//sdks.shopifycdn.com/buy-button/latest/buybutton.js');
+            Requirements::customScript(<<<JS
+            (function () {
+                var client = ShopifyBuy.buildClient({
+                  domain: '{$domain}',
+                  storefrontAccessToken: '{$accessToken}'
+                });
+                
+                window.shopifyClient = ShopifyBuy.UI.init(client);
+                window.shopifyClient.createComponent('cart', {
+                   node: document.getElementById('shopify-cart'),
+                   moneyFormat: '$currencySymbol{{amount}}',
+                   options: {$this->getCartOptions()}
+                });
+            })();
 JS
-        );
+            );
+        }
     }
 }

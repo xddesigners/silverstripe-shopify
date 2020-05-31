@@ -53,6 +53,12 @@ class Client
     private static $shared_secret = null;
 
     /**
+     * Set this to false when creating your own custom shopify buy js
+     * @config null|string
+     */
+    private static $inject_javascript = true;
+
+    /**
      * @var \GuzzleHttp\Client|null
      */
     protected $client = null;
