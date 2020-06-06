@@ -93,6 +93,10 @@ class Collection extends DataObject
         'ShopifyID'
     ];
 
+    private static $casting = array(
+        'MetaTags' => 'HTMLFragment'
+    );
+
     private static $extensions = [
         Versioned::class
     ];
