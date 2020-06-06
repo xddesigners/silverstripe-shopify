@@ -22,6 +22,16 @@ class ShopifyPageController extends \PageController
     ];
 
     /**
+     * @var Product
+     */
+    public $product;
+
+    /**
+     * @var Collection
+     */
+    public $collection;
+
+    /**
      * Get the Child pages as a paginated list
      *
      * @return PaginatedList
@@ -46,6 +56,7 @@ class ShopifyPageController extends \PageController
             $this->httpError(404);
         }
 
+        $this->collection = $product;
         return $this->render($collection);
     }
 
@@ -60,6 +71,7 @@ class ShopifyPageController extends \PageController
             $this->httpError(404);
         }
 
+        $this->product = $product;
         return $this->render($product);
     }
 }
