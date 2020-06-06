@@ -129,6 +129,22 @@ class Collection extends DataObject
         return Director::absoluteURL($this->Link($action));
     }
 
+    public function MetaTags($includeTitle = true)
+    {
+        $tags = '';
+        $this->extend('MetaTags', $tags);
+        return $tags;
+    }
+
+    public function getOGImage()
+    {
+        if (($image = $this->Image()) && $image->exists()) {
+            return $image->Pad(1200, 630)->getAbsoluteURL();
+        }
+
+        return null;
+    }
+
     /**
      * Creates a new Shopify Collection from the given data
      * but does not publish it

@@ -127,6 +127,10 @@ class Product extends DataObject
         'ShopifyID'
     ];
 
+    private static $casting = array(
+        'MetaTags' => 'HTMLFragment'
+    );
+
     private static $extensions = [
         Versioned::class
     ];
@@ -232,6 +236,22 @@ JS
 
     public function AbsoluteLink($action = null) {
         return Director::absoluteURL($this->Link($action));
+    }
+
+    public function MetaTags($includeTitle = true)
+    {
+        $tags = '';
+        $this->extend('MetaTags', $tags);
+        return $tags;
+    }
+
+    public function getOGImage()
+    {
+        if (($image = $this->Image()) && $image->exists()) {
+            return $image->Pad(1200, 630)->getAbsoluteURL();
+        }
+
+        return null;
     }
 
     /**
