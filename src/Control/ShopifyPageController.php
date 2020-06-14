@@ -56,7 +56,7 @@ class ShopifyPageController extends \PageController
             $this->httpError(404);
         }
 
-        $this->collection = $product;
+        $this->collection = $collection;
         return $this->render($collection);
     }
 
