@@ -287,4 +287,8 @@ JS
     {
         return DataObject::get_one(self::class, ['URLSegment' => $urlSegment]);
     }
+
+    function canView($member = null) {
+        return true;
+    }
 }
