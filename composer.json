@@ -19,11 +19,6 @@
 		"composer/installers": "*",
 		"guzzlehttp/guzzle": "*"
 	},
-	"extra": {
-		"expose": [
-			"images"
-		]
-	},
 	"autoload": {
 		"psr-4": {
 			"XD\\Shopify\\": "src"
