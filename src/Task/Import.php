@@ -150,8 +150,10 @@ class Import extends BuildTask
 
                     // Create the variants
                     if (!empty($shopifyProduct->variants)) {
+                        $keepVariants = [];
                         foreach ($shopifyProduct->variants as $shopifyVariant) {
                             if ($variant = $this->importObject(ProductVariant::class, $shopifyVariant)) {
+                                $keepVariants[] = $variant->ID;
                                 $product->Variants()->add($variant);
                                 if (!$variant->isLiveVersion()) {
                                     $variant->publishSingle();
@@ -160,6 +162,15 @@ class Import extends BuildTask
                                     self::log("[{$variant->ID}] Variant {$variant->Title} is alreaddy published", self::SUCCESS);
                                 }
                             }
+                        }
+
+                        foreach ($product->Variants()->exclude(['ID' => $keepVariants]) as $variant) {
+                            /** @var ProductVariant $variant */
+                            $variantId = $variant->ID;
+                            $variantShopifyId = $variant->ShopifyID;
+                            $variant->doUnpublish();
+                            $variant->delete();
+                            self::log("[{$variantId}][{$variantShopifyId}] Deleted old variant connected to product", self::SUCCESS);
                         }
                     }
 
