@@ -117,6 +117,13 @@ class Import extends BuildTask
                 // Create the product
                 if ($product = $this->importObject(Product::class, $shopifyProduct)) {
                     // Create the images
+                    if ($product->ShopifyID == '5874056724635') {
+                        echo "<pre>";
+                        print_r($shopifyProduct);
+                        echo "</pre>";
+                        exit();
+                    }
+
                     $images = new ArrayList($shopifyProduct->images);
                     if ($images->exists()) {
                         foreach ($shopifyProduct->images as $shopifyImage) {
@@ -173,7 +180,6 @@ class Import extends BuildTask
                             self::log("[{$variantId}][{$variantShopifyId}] Deleted old variant connected to product", self::SUCCESS);
                         }
                     }
-
                     if ($product->isChanged()) {
                         $product->write();
                         self::log("[{$product->ID}] Saved changes in product {$product->Title}", self::SUCCESS);
@@ -188,6 +194,8 @@ class Import extends BuildTask
                     } else {
                         self::log("[{$product->ID}] Product {$product->Title} is alreaddy published", self::SUCCESS);
                     }
+
+                    $product->extend('onAfterImport');
                     $lastId = $product->ShopifyID;
                 } else {
                     self::log("[{$shopifyProduct->id}] Could not create product", self::ERROR);

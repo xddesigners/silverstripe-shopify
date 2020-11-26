@@ -93,6 +93,11 @@ class Collection extends DataObject
         'ShopifyID'
     ];
 
+    private static $searchable_fields = [
+        'Title',
+        'ShopifyID'
+    ];
+
     private static $casting = array(
         'MetaTags' => 'HTMLFragment'
     );
