@@ -117,13 +117,6 @@ class Import extends BuildTask
                 // Create the product
                 if ($product = $this->importObject(Product::class, $shopifyProduct)) {
                     // Create the images
-                    if ($product->ShopifyID == '5874056724635') {
-                        echo "<pre>";
-                        print_r($shopifyProduct);
-                        echo "</pre>";
-                        exit();
-                    }
-
                     $images = new ArrayList($shopifyProduct->images);
                     if ($images->exists()) {
                         foreach ($shopifyProduct->images as $shopifyImage) {
