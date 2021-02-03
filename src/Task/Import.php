@@ -50,6 +50,7 @@ class Import extends BuildTask
         // Import listings need a special authentication so fallback to everything
         $importedListingIds = $this->getProductListingIds($client);
         $this->importProducts($client, $importedListingIds);
+        // todo: migrate to
         $this->beforeImportCollects();
         $this->importCollects($client);
         $this->afterImportCollects();
@@ -298,41 +299,42 @@ class Import extends BuildTask
      *
      * @throws \SilverStripe\ORM\ValidationException
      */
-    public function importCollects(Client $client, $sinceId = 0)
+    public function importCollects(Client $client)
     {
-        try {
-            $collects = $client->collects([
-                'query' => [
-                    'limit' => 250,
-                    'since_id' => $sinceId
-                ]
-            ]);
-        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-            exit($e->getMessage());
+        $collections = Collection::get();
+        if (!$collections->count()) {
+            self::log("[collection] No collections to parse");
+            return;
         }
 
-        if (($collects = $collects->getBody()->getContents()) && $collects = Convert::json2obj($collects)) {
-            $lastId = $sinceId;
-            foreach ($collects->collects as $shopifyCollect) {
-                if (
-                    ($collection = Collection::getByShopifyID($shopifyCollect->collection_id))
-                    && ($product = Product::getByShopifyID($shopifyCollect->product_id))
-                ) {
-                    $collection->Products()->add($product, [
-                        'ShopifyID' => $shopifyCollect->id,
-                        'SortValue' => $shopifyCollect->sort_value,
-                        'Position' => $shopifyCollect->position,
-                        'Imported' => true
-                    ]);
-
-                    $lastId = $shopifyCollect->id;
-                    self::log("[{$shopifyCollect->id}] Created collect between Product[{$product->ID}] and Collection[{$collection->ID}]", self::SUCCESS);
-                }
+        foreach ($collections as $collection) {
+            /** @var Collection $collection */
+            $collects = null;
+            try {
+                $collects = $client->collectionProducts($collection->ShopifyID, [
+                    'query' => [
+                        'limit' => 250,
+                    ]
+                ]);
+            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                self::log($e->getMessage(), self::ERROR);
             }
+            
+            if ($collects && ($collects = $collects->getBody()->getContents()) && $collects = Convert::json2obj($collects)) {
+                foreach ($collects->products as $index => $shopifProduct) {
+                    if (($product = Product::getByShopifyID($shopifProduct->id)) && $product->exists()) {
+                        $collection->Products()->add($product, [
+                            'SortValue' => $index,
+                            'Imported' => true
+                            // $shopifyCollect->sort_value,
+                            // 'ShopifyID' => $shopifyCollect->id,
+                            // 'Position' => $shopifyCollect->position,
+                        ]);
 
-            if ($lastId !== $sinceId) {
-                self::log("[{$sinceId}] Try to import the next page of collects since last id", self::SUCCESS);
-                $this->importCollects($client, $lastId);
+//                        $lastId = $shopifyCollect->id;
+                        self::log("[collection] Created collect between Product[{$product->ID}] and Collection[{$collection->ID}]", self::SUCCESS);
+                    }
+                }
             }
         }
     }

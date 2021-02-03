@@ -112,9 +112,15 @@ class Client
         return $this->client->request('GET', 'custom_collections.json', $options);
     }
 
+    public function collectionProducts($collectionId, array $options = [])
+    {
+        return $this->client->request('GET', "collections/{$collectionId}/products.json", $options);
+    }
+
     /**
      * Get the connections between Products and Collections
      *
+     * @deprecated use collectionProducts() instead
      * @return mixed|\Psr\Http\Message\ResponseInterface
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
